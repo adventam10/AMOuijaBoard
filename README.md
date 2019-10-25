@@ -30,11 +30,26 @@ view.addSubview(boardView)
 Conform to the protocol in the class implementation.
 
 ```swift
-func didSelectGoodBye(in ouijaBoardView: AMOuijaBoardView) { 
-}
-
-func ouijaBoardView(_ ouijaBoardView: AMOuijaBoardView, didSelectText text: String)) { 
+func ouijaBoardView(_ ouijaBoardView: AMOuijaBoardView, didSelectKey key: AMOuijaBoardView.Key) {
+  switch key {
+  case .goodbye:
+    // selected Goodbye
+    break
+  case .no:
+    // selected No
+    break  
+  case .yes:
+    // selected Yes
+    break
+  case .alphabet(let text):
+    // selected alphabet
     // use selected text here
+    break
+  case .number(let text):
+    // selected number
+    // use selected text here
+    break
+  } 
 }
 ```
 
