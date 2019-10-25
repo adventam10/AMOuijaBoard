@@ -9,11 +9,18 @@
 import UIKit
 
 public protocol AMOuijaBoardViewDelegate: AnyObject {
-    func didSelectGoodBye(in ouijaBoardView: AMOuijaBoardView)
-    func ouijaBoardView(_ ouijaBoardView: AMOuijaBoardView, didSelectText text: String)
+    func ouijaBoardView(_ ouijaBoardView: AMOuijaBoardView, didSelectKey key: AMOuijaBoardView.Key)
 }
 
 final public class AMOuijaBoardView: UIView {
+    
+    public enum Key {
+        case yes
+        case no
+        case goodbye
+        case alphabet(String)
+        case number(String)
+    }
     
     public weak var delegate: AMOuijaBoardViewDelegate?
     public var font: UIFont = UIFont(name: "AcademyEngravedLetPlain", size: 15) ?? .systemFont(ofSize: 15)
@@ -28,6 +35,8 @@ final public class AMOuijaBoardView: UIView {
     private let boardView = UIView()
     private var boardLayer: CAShapeLayer?
     private var goodByeLayer: CATextLayer?
+    private var yesLayer: CATextLayer?
+    private var noLayer: CATextLayer?
     private var cursorLayer: CAShapeLayer?
     private var alphabetLayers = [CATextLayer]()
     private var numberLayers = [CATextLayer]()
@@ -151,18 +160,26 @@ final public class AMOuijaBoardView: UIView {
     @objc private func tapAction(_ gesture: UITapGestureRecognizer) {
         let point = gesture.location(in: boardView)
         if goodByeLayer?.frame.contains(point) == true {
-            delegate?.didSelectGoodBye(in: self)
+            delegate?.ouijaBoardView(self, didSelectKey: .goodbye)
+        }
+        if yesLayer?.frame.contains(point) == true {
+            cursorLayer?.position = revisePosition(yesLayer!.position)
+            delegate?.ouijaBoardView(self, didSelectKey: .yes)
+        }
+        if noLayer?.frame.contains(point) == true {
+            cursorLayer?.position = revisePosition(noLayer!.position)
+            delegate?.ouijaBoardView(self, didSelectKey: .no)
         }
         alphabetLayers.forEach {
             if $0.frame.contains(point) {
                 cursorLayer?.position = revisePosition($0.position)
-                delegate?.ouijaBoardView(self, didSelectText: $0.string as! String)
+                delegate?.ouijaBoardView(self, didSelectKey: .alphabet($0.string as! String))
             }
         }
         numberLayers.forEach {
             if $0.frame.contains(point) {
                 cursorLayer?.position = revisePosition($0.position)
-                delegate?.ouijaBoardView(self, didSelectText: $0.string as! String)
+                delegate?.ouijaBoardView(self, didSelectKey: .number($0.string as! String))
             }
         }
     }
@@ -215,6 +232,10 @@ final public class AMOuijaBoardView: UIView {
         numberLayers.removeAll()
         goodByeLayer?.removeFromSuperlayer()
         goodByeLayer = nil
+        yesLayer?.removeFromSuperlayer()
+        yesLayer = nil
+        noLayer?.removeFromSuperlayer()
+        noLayer = nil
         boardLayer?.sublayers?.forEach { $0.removeFromSuperlayer() }
         boardLayer?.removeFromSuperlayer()
         boardLayer = nil
@@ -349,16 +370,16 @@ final public class AMOuijaBoardView: UIView {
         titleLayer.frame = CGRect(origin: .init(x: innerBorderFrame.maxX - innerBorderFrame.width/2 - titleLayer.frame.size.width/2,
                                                 y: innerBorderFrame.minY + topMargin),
                                   size: titleLayer.frame.size)
-        let yesLayer = makeBackTextLayer("YES")
-        yesLayer.frame = CGRect(origin: .init(x: innerBorderFrame.minX + cornerMarkMargin + cornerMarkRadius*2 + subTextSideMargin,
+        yesLayer = makeBackTextLayer("YES")
+        yesLayer?.frame = CGRect(origin: .init(x: innerBorderFrame.minX + cornerMarkMargin + cornerMarkRadius*2 + subTextSideMargin,
                                               y: innerBorderFrame.minY + topMargin + subTextTopMargin),
-                                size: yesLayer.frame.size)
-        boardLayer?.addSublayer(yesLayer)
-        let noLayer = makeBackTextLayer("NO ")
-        noLayer.frame = CGRect(origin: .init(x: innerBorderFrame.maxX - noLayer.frame.size.width - (cornerMarkMargin + cornerMarkRadius*2 + subTextSideMargin),
+                                size: yesLayer!.frame.size)
+        boardLayer?.addSublayer(yesLayer!)
+        noLayer = makeBackTextLayer("NO ")
+        noLayer?.frame = CGRect(origin: .init(x: innerBorderFrame.maxX - noLayer!.frame.size.width - (cornerMarkMargin + cornerMarkRadius*2 + subTextSideMargin),
                                                      y: innerBorderFrame.minY + topMargin + subTextTopMargin),
-                                       size: noLayer.frame.size)
-        boardLayer?.addSublayer(noLayer)
+                                       size: noLayer!.frame.size)
+        boardLayer?.addSublayer(noLayer!)
     }
     
     private func setBackLayers(cornerMarkRadius: CGFloat) {

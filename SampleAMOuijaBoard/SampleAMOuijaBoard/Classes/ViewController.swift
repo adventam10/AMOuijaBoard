@@ -46,11 +46,20 @@ class ViewController: UIViewController {
 }
 
 extension ViewController: AMOuijaBoardViewDelegate {
-    func didSelectGoodBye(in ouijaBoardView: AMOuijaBoardView) {
-        label.text = ""
-    }
-    
-    func ouijaBoardView(_ ouijaBoardView: AMOuijaBoardView, didSelectText text: String) {
-        label.text! += text
+    func ouijaBoardView(_ ouijaBoardView: AMOuijaBoardView, didSelectKey key: AMOuijaBoardView.Key) {
+        switch key {
+        case .goodbye:
+            label.text = ""
+        case .no:
+            let text = label.text!
+            if text.isEmpty {
+                return
+            }
+            label.text = text.prefix(text.count - 1).map { String($0) }.joined()
+        case .yes:
+            break
+        case .alphabet(let text), .number(let text):
+            label.text! += text
+        }
     }
 }
