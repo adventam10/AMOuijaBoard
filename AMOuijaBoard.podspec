@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
     s.name         = "AMOuijaBoard"
-    s.version      = "1.0.0"
+    s.version      = "1.0.1"
     s.summary      = "AMOuijaBoard is a view can select text."
     s.license      = { :type => 'MIT', :file => 'LICENSE' }
     s.homepage     = "https://github.com/adventam10/AMOuijaBoard"
